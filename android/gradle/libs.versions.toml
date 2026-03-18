@@ -1,0 +1,76 @@
+[versions]
+agp                 = "8.5.0"
+kotlin              = "2.0.0"
+ksp                 = "2.0.0-1.0.21"
+hilt                = "2.51"
+compose-bom         = "2024.06.00"
+lifecycle           = "2.8.2"
+navigation          = "2.7.7"
+room                = "2.6.1"
+coroutines          = "1.8.1"
+itext               = "7.2.5"
+executorch          = "0.3.0"
+objectbox           = "3.9.0"
+accompanist         = "0.34.0"
+coil                = "2.6.0"
+timber              = "5.0.1"
+
+[libraries]
+# Compose
+compose-bom                  = { group = "androidx.compose", name = "compose-bom",          version.ref = "compose-bom" }
+compose-ui                   = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-tooling           = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview   = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-material3            = { group = "androidx.compose.material3", name = "material3" }
+compose-material-icons       = { group = "androidx.compose.material", name = "material-icons-extended" }
+compose-activity             = { group = "androidx.activity", name = "activity-compose",    version = "1.9.0" }
+compose-viewmodel            = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+compose-lifecycle-runtime    = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+compose-navigation           = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+
+# Hilt
+hilt-android                 = { group = "com.google.dagger", name = "hilt-android",      version.ref = "hilt" }
+hilt-compiler                = { group = "com.google.dagger", name = "hilt-compiler",     version.ref = "hilt" }
+hilt-navigation-compose      = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
+
+# Room
+room-runtime                 = { group = "androidx.room", name = "room-runtime",   version.ref = "room" }
+room-ktx                     = { group = "androidx.room", name = "room-ktx",       version.ref = "room" }
+room-compiler                = { group = "androidx.room", name = "room-compiler",  version.ref = "room" }
+
+# Coroutines
+coroutines-android           = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# PDF Parsing — iText 7 Community (AGPL)
+itext-core                   = { group = "com.itextpdf", name = "itext-core", version.ref = "itext" }
+
+# ExecuTorch — on-device LLM runtime
+executorch-android           = { group = "org.pytorch", name = "executorch-android", version.ref = "executorch" }
+
+# ObjectBox — local vector DB alternative to SQLite-VSS
+objectbox-android            = { group = "io.objectbox", name = "objectbox-android", version.ref = "objectbox" }
+objectbox-kotlin             = { group = "io.objectbox", name = "objectbox-kotlin",  version.ref = "objectbox" }
+objectbox-processor          = { group = "io.objectbox", name = "objectbox-processor",version.ref = "objectbox" }
+
+# Accompanist (permissions, etc.)
+accompanist-permissions      = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
+# Coil (image loading)
+coil-compose                 = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
+# Timber logging
+timber                       = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Core
+core-ktx                     = { group = "androidx.core", name = "core-ktx",     version = "1.13.1" }
+datastore                    = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.1" }
+
+# Testing
+test-junit                   = { group = "junit", name = "junit", version = "4.13.2" }
+test-coroutines              = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+
+[plugins]
+android-application = { id = "com.android.application",   version.ref = "agp"    }
+kotlin-android      = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt                = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp                 = { id = "com.google.devtools.ksp",    version.ref = "ksp"    }

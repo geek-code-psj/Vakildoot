@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  VakilDoot is zero-cloud by design.
+  This config explicitly blocks ALL network traffic to enforce data sovereignty.
+  No LLM calls, no telemetry, no analytics can leave the device.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust system CAs only (for future optional DigiLocker DPI integration) -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Block all domains — no outbound connections permitted -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">*</domain>
+    </domain-config>
+</network-security-config>

@@ -1,0 +1,28 @@
+﻿# Build files
+.gradle/
+.idea/
+build/
+*.apk
+*.aab
+# Local properties
+local.properties
+# IDE
+*.iml
+.DS_Store
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+venv/
+# Models (too large for git)
+*.pte
+*.task
+*.onnx
+*.pt
+*.bin
+# Data
+*.csv
+*.jsonl

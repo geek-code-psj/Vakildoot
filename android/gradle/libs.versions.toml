@@ -1,6 +1,7 @@
 [versions]
-agp                 = "8.5.0"
+agp                 = "8.8.0-rc01"
 kotlin              = "2.0.0"
+compose-compiler    = "2.0.0"
 ksp                 = "2.0.0-1.0.21"
 hilt                = "2.51"
 compose-bom         = "2024.06.00"
@@ -8,12 +9,13 @@ lifecycle           = "2.8.2"
 navigation          = "2.7.7"
 room                = "2.6.1"
 coroutines          = "1.8.1"
-itext               = "7.2.5"
-executorch          = "0.3.0"
-objectbox           = "3.9.0"
+pdfbox-android      = "2.0.27.0"
+mediapipe-genai     = "0.10.14"
+objectbox           = "3.8.0"
 accompanist         = "0.34.0"
 coil                = "2.6.0"
 timber              = "5.0.1"
+core-ktx            = "1.15.0"
 
 [libraries]
 # Compose
@@ -41,13 +43,15 @@ room-compiler                = { group = "androidx.room", name = "room-compiler"
 # Coroutines
 coroutines-android           = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
-# PDF Parsing — iText 7 Community (AGPL)
-itext-core                   = { group = "com.itextpdf", name = "itext-core", version.ref = "itext" }
+# PDF Parsing — PDFBox Android (Apache 2.0, proven stable)
+pdfbox-android               = { group = "com.tom-roush", name = "pdfbox-android", version.ref = "pdfbox-android" }
 
-# ExecuTorch — on-device LLM runtime
-executorch-android           = { group = "org.pytorch", name = "executorch-android", version.ref = "executorch" }
+# On-device LLM inference — MediaPipe GenAI
+mediapipe-genai              = { group = "com.google.mediapipe", name = "tasks-genai", version.ref = "mediapipe-genai" }
+mediapipe-text               = { group = "com.google.mediapipe", name = "tasks-text", version.ref = "mediapipe-genai" }
 
-# ObjectBox — local vector DB alternative to SQLite-VSS
+
+# ObjectBox — local vector DB (v3.8.0 is latest stable)
 objectbox-android            = { group = "io.objectbox", name = "objectbox-android", version.ref = "objectbox" }
 objectbox-kotlin             = { group = "io.objectbox", name = "objectbox-kotlin",  version.ref = "objectbox" }
 objectbox-processor          = { group = "io.objectbox", name = "objectbox-processor",version.ref = "objectbox" }
@@ -62,15 +66,17 @@ coil-compose                 = { group = "io.coil-kt", name = "coil-compose", ve
 timber                       = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # Core
-core-ktx                     = { group = "androidx.core", name = "core-ktx",     version = "1.13.1" }
+core-ktx                     = { group = "androidx.core", name = "core-ktx",     version.ref = "core-ktx" }
 datastore                    = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.1" }
 
 # Testing
 test-junit                   = { group = "junit", name = "junit", version = "4.13.2" }
 test-coroutines              = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
+
 [plugins]
 android-application = { id = "com.android.application",   version.ref = "agp"    }
 kotlin-android      = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler    = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "compose-compiler" }
 hilt                = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp                 = { id = "com.google.devtools.ksp",    version.ref = "ksp"    }

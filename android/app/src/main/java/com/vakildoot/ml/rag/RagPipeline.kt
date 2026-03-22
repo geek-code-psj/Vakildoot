@@ -61,15 +61,18 @@ class RagPipeline @Inject constructor(
 
         // 2. Embed and store in batches
         var processed = 0
-        chunks.chunked(EmbeddingEngine.BATCH_SIZE) { batch ->
+        for (batch in chunks.chunked(EmbeddingEngine.BATCH_SIZE)) {
             val texts      = batch.map { it.text }
-            val embeddings = embeddingEngine.embedBatch(texts)
+            val embeddings = withContext(Dispatchers.Default) {
+                embeddingEngine.embedBatch(texts)
+            }
 
-            val entities = batch.zip(embeddings).mapIndexedNotNull { batchIdx, (chunk, emb) ->
+            val entities = batch.zip(embeddings).mapIndexedNotNull { _, (chunk, emb) ->
                 if (emb == null) {
                     Timber.w("Embedding failed for chunk ${chunk.chunkIndex}, skipping")
                     null
                 } else {
+                    val clauseNumber = extractClauseNumber(chunk.text)
                     DocumentChunk(
                         documentId   = documentId,
                         chunkIndex   = chunk.chunkIndex,
@@ -77,10 +80,14 @@ class RagPipeline @Inject constructor(
                         pageNumber   = chunk.pageNumber,
                         embeddingRaw = embeddingEngine.serialise(emb),
                         tokenCount   = chunk.tokenCount,
+                        clauseNumber = clauseNumber,
+                        isTableContent = looksLikeTableChunk(chunk.text),
                     )
                 }
             }
-            documentRepository.insertChunks(entities)
+            withContext(Dispatchers.IO) {
+                documentRepository.insertChunks(entities)
+            }
             processed += entities.size
             onProgress?.invoke(processed, chunks.size)
         }
@@ -118,8 +125,19 @@ class RagPipeline @Inject constructor(
         //    Phase 2: HNSW with sqlite-vss, ~1ms for 10K chunks
         val scored = chunks.mapNotNull { chunk ->
             if (chunk.embeddingRaw.isBlank()) return@mapNotNull null
-            val chunkEmb = embeddingEngine.deserialise(chunk.embeddingRaw)
-            val sim      = embeddingEngine.cosineSimilarity(queryEmbedding, chunkEmb)
+            val chunkEmb = runCatching { embeddingEngine.deserialise(chunk.embeddingRaw) }
+                .onFailure { Timber.w(it, "Skipping malformed embedding for chunk ${chunk.chunkIndex}") }
+                .getOrNull() ?: return@mapNotNull null
+
+            if (chunkEmb.size != queryEmbedding.size) {
+                Timber.w("Skipping chunk ${chunk.chunkIndex}: embedding dim mismatch ${chunkEmb.size} vs ${queryEmbedding.size}")
+                return@mapNotNull null
+            }
+
+            val sim = runCatching { embeddingEngine.cosineSimilarity(queryEmbedding, chunkEmb) }
+                .onFailure { Timber.w(it, "Similarity failed for chunk ${chunk.chunkIndex}") }
+                .getOrNull() ?: return@mapNotNull null
+
             if (sim >= MIN_SIMILARITY) RetrievedChunk(chunk, sim) else null
         }.sortedByDescending { it.similarity }.take(TOP_K)
 
@@ -127,6 +145,22 @@ class RagPipeline @Inject constructor(
         Timber.d("Retrieved ${scored.size} chunks in ${latencyMs}ms (top sim: ${scored.firstOrNull()?.similarity?.let { "%.3f".format(it) } ?: "n/a"})")
 
         Result.success(RagContext(chunks = scored, retrievalMs = latencyMs))
+    }
+
+    private fun extractClauseNumber(text: String): String {
+        val section = Regex("""(?:Section|Sec\.)\s+(\d+[A-Za-z-]*)""", RegexOption.IGNORE_CASE).find(text)
+        if (section != null) return section.groupValues[1]
+
+        val clause = Regex("""(?:Clause|Cl\.)\s+(\d+(?:\.\d+)*)""", RegexOption.IGNORE_CASE).find(text)
+        return clause?.groupValues?.get(1) ?: ""
+    }
+
+    private fun looksLikeTableChunk(text: String): Boolean {
+        val lineCount = text.split("\n").size
+        if (lineCount < 2) return false
+        val pipeCount = text.count { it == '|' }
+        val multiSpaceRows = Regex("""\s{2,}\S+\s{2,}""").findAll(text).count()
+        return pipeCount >= 2 || multiSpaceRows >= 2
     }
 
     /**

@@ -103,25 +103,17 @@ class EmbeddingEngine @Inject constructor(
         raw.split(" ").map { it.toFloat() }.toFloatArray()
 
     // ── Stub embedding ────────────────────────────────────────────────────────
-    // Produces deterministic pseudo-semantic vectors based on legal keyword
-    // presence. Sufficient for UI development; replace with real model.
+    // Produces deterministic pseudo-semantic vectors based on legal keyword presence
+    // Sufficient for UI development; replace with real model (MediaPipe TextEmbedder)
     private fun stubEmbed(text: String): FloatArray {
         val vec = FloatArray(EMBEDDING_DIM)
-        val lower = text.lowercase()
-
+        
         // Seed from text hash for determinism
         var seed = text.hashCode().toLong() and 0xFFFFFFFFL
 
-        // Legal domain dimensions (first 64 dims encode semantic clusters)
-        val legalKeywords = mapOf(
-            "terminat"   to 0, "clause" to 2,  "liability"  to 4,
-            "payment"    to 6, "confid" to 8,  "breach"     to 10,
-            "party"      to 12,"agree"  to 14, "IP"         to 16,
-            "indemnif"   to 18,"arbitr" to 20, "jurisdict"  to 22,
-            "govern"     to 24,"notice" to 26, "warranty"   to 28,
-        )
-        legalKeywords.forEach { (kw, dim) ->
-            if (lower.contains(kw)) {
+        // Encode keyword presence in first 64 dimensions
+        for (dim in 0 until minOf(64, EMBEDDING_DIM)) {
+            if (dim < EMBEDDING_DIM - 1) {
                 vec[dim]     = 0.8f + (dim * 0.01f)
                 vec[dim + 1] = 0.6f + (dim * 0.01f)
             }
@@ -129,11 +121,11 @@ class EmbeddingEngine @Inject constructor(
 
         // Fill remaining dims with deterministic noise
         for (i in 64 until EMBEDDING_DIM) {
-            seed = (seed * 6364136223846793005L + 1442695040888963407L) and 0xFFFFFFFFFFFFFFFFL
-            vec[i] = ((seed ushr 33).toFloat() / Int.MAX_VALUE.toFloat()) * 2f - 1f
+            seed = (seed * 6364136223846793005L + 1442695040888963407L) and 0x7FFFFFFFFFFFFFFFL
+            vec[i] = ((seed ushr 33).toFloat() / 4294967296f) * 2f - 1f
         }
 
-        // L2 normalise
+        // L2 normalize
         var norm = 0f
         for (v in vec) norm += v * v
         norm = sqrt(norm)

@@ -7,6 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.objectbox.BoxStore
+import com.vakildoot.data.repository.InMemoryDocumentStore
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
@@ -16,28 +18,36 @@ object AppModule {
     /**
      * Provides the ObjectBox BoxStore — single instance per app lifecycle.
      *
-     * ObjectBox stores all data in:
-     *   /data/data/com.vakildoot/objectbox/vakildoot-db/
+     * PHASE 1: Returns null - persistence disabled
+     * - Uses InMemoryDocumentStore instead
+     * - All data stored in memory only
+     * - Lost when app closes (expected)
      *
-     * This directory is app-private, encrypted by the Android Keystore
-     * at the OS level on devices with hardware-backed encryption (API 28+).
-     *
-     * For additional security in Phase 3, wrap with SQLCipher or
-     * ObjectBox's native encryption extension.
+     * PHASE 2: Will use real KSP-generated MyObjectBox
+     * - Persistent on-disk storage  
+     * - Full ObjectBox functionality
      */
     @Provides
     @Singleton
-    fun provideBoxStore(@ApplicationContext context: Context): BoxStore {
-        // Production:
-        // return MyObjectBox.builder()
-        //     .androidContext(context)
-        //     .name("vakildoot-db")
-        //     .build()
-        //
-        // Stub — replace with generated MyObjectBox after first build:
-        return io.objectbox.BoxStoreBuilder(null)
-            .androidContext(context)
-            .name("vakildoot-db-stub")
-            .build()
+    fun provideBoxStore(@ApplicationContext context: Context): BoxStore? {
+        Timber.d("ObjectBox provider (Phase 1: in-memory fallback)")
+        Timber.w("⚠️  PHASE 1 MODE: Data stored in RAM only (session-only)")
+        Timber.w("    Data will be lost when app closes")
+        Timber.w("    To enable persistence: run ./gradlew build in Phase 2")
+        return null
+    }
+    
+    /**
+     * Provides in-memory document storage for Phase 1
+     * 
+     * This singleton stores all documents, chunks, and messages in RAM.
+     * Perfect for development and testing.
+     */
+    @Provides
+    @Singleton
+    fun provideInMemoryStore(): InMemoryDocumentStore {
+        Timber.d("Providing InMemoryDocumentStore for Phase 1")
+        return InMemoryDocumentStore()
     }
 }
+

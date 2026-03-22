@@ -23,6 +23,10 @@ object VakilColors {
     val Gold2        = Color(0xFFF0C96A)
     val GoldBg       = Color(0x14D4A843)  // 8% opacity
 
+    // Orange accent (secondary - for highlights)
+    val Orange       = Color(0xFFFF6B35)
+    val OrangeBg     = Color(0x14FF6B35)  // 8% opacity
+
     // Text hierarchy
     val TextPrimary  = Color(0xFFE8E6F0)
     val TextSecondary= Color(0xFF9896AA)
@@ -39,6 +43,10 @@ object VakilColors {
     // Border
     val Border       = Color(0x12FFFFFF)
     val Border2      = Color(0x1FFFFFFF)
+
+    // Gradient
+    val GradientStart= Color(0xFF13151F)
+    val GradientEnd  = Color(0xFF1C1E2C)
 }
 
 private val DarkColorScheme = darkColorScheme(

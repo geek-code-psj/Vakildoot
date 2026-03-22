@@ -24,6 +24,8 @@ data class Document(
     val summary: String = "",
     val isIndexed: Boolean = false,
     val modelUsed: String = "",       // which SLM generated the analysis
+    val clauses: String = "",         // JSON: list of detected clauses like "3.1, 3.2, 4.0..."
+    val hasTableContent: Boolean = false,
 )
 
 // ─────────────────────────────────────────────────────────────
@@ -40,6 +42,8 @@ data class DocumentChunk(
     // support float arrays natively; Phase 2 migrates to sqlite-vss)
     val embeddingRaw: String = "",
     val tokenCount: Int = 0,
+    val clauseNumber: String = "",    // e.g. "3.2" or empty if not a clause chunk
+    val isTableContent: Boolean = false,
 )
 
 // ─────────────────────────────────────────────────────────────
@@ -55,6 +59,8 @@ data class ChatMessage(
     val sourceClauses: String = "",   // comma-separated clause refs
     val latencyMs: Long = 0L,
     val tokensUsed: Int = 0,
+    val sourceValidated: Boolean = false,  // were clause citations verified?
+    val confidenceScore: Float = 0.5f,     // 0.0–1.0, how confident is this response?
 )
 
 // ─────────────────────────────────────────────────────────────

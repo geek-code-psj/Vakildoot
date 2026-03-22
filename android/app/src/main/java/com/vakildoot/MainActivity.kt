@@ -35,15 +35,17 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val uiState by viewModel.uiState.collectAsState()
 
-                    VakilDootRoot(
-                        uiState            = uiState,
-                        onDocumentSelected = viewModel::onDocumentSelected,
-                        onUploadPdf        = viewModel::indexDocument,
-                        onSendMessage      = viewModel::sendMessage,
-                        onDeleteDocument   = viewModel::deleteDocument,
-                        onShowUpload       = viewModel::showUploadSheet,
-                        onResetIndexing    = viewModel::resetIndexingState,
-                    )
+                    if (uiState != null) {
+                        VakilDootRoot(
+                            uiState            = uiState,
+                            onDocumentSelected = { viewModel.onDocumentSelected(it) },
+                            onUploadPdf        = { viewModel.indexDocument(it) },
+                            onSendMessage      = { viewModel.sendMessage(it) },
+                            onDeleteDocument   = { viewModel.deleteDocument(it) },
+                            onShowUpload       = { viewModel.showUploadSheet(it) },
+                            onResetIndexing    = { viewModel.resetIndexingState() },
+                        )
+                    }
                 }
             }
         }
